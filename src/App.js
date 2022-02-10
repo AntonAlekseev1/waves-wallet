@@ -4,8 +4,8 @@ const WeSdk = require('@wavesenterprise/js-sdk');
 
 const config = {
   ...WeSdk.MAINNET_CONFIG,
-  nodeAddress: '/node-alex/',
-  crypto: 'waves',
+  nodeAddress: '/node-test/',
+  crypto: 'gost', // there are two encryption options 'gost' and 'waves'
   networkByte: 'V'.charCodeAt(0)
 }
 
