@@ -8,18 +8,13 @@
   <body>
     <div id="root"></div>
 	<div>
-	  <p><b>Введите пароль для шифрования seed фразы</b></p><Br>
-         <input type = "password" placeholder = "password" id = "password">
+	  <p><b>Создать кошелек</b></p><Br>
 	     <button id = "send_button">Создать кошелек</button>
 	  <p></p>
-      <p><b>Перевод токенов</b></p><Br>
-	    <input type = "text" placeholder = "address to" id = "addres_to">
-	    <input type = "text" placeholder = "amount" id = "amount_input"><Br>
-	    <button id = "send_transaction_button">Отправить</button>
 	  <p><b>Восстановить кошелек по seed фразе</b></p><Br>
 	    <input type = "text" placeholder = "seed phrase" id = "seed_phrase">
 	    <button id = "restore_button">Восстановить кошелек</button>
-	  <p><b>Вызов смарт контракта</b></p><Br>
+	  <p><b>Вызов метода смарт-контракта 'createUserRegistrationRequest'</b></p><Br>
 	    <input type = "text" placeholder = "contract Id" id = "contract_id">
 	    <input type = "number" placeholder = "contract version" id = "contract_version">
 		<button id = "call_contract_btn">Отправить</button>

@@ -4,30 +4,20 @@ const WeSdk = require('@wavesenterprise/js-sdk');
 
 const config = {
   ...WeSdk.MAINNET_CONFIG,
-  nodeAddress: '/node-test/',
-  crypto: 'gost', // there are two encryption options 'gost' and 'waves'
+  nodeAddress: '/node-0/',
+  crypto: 'waves', // there are two encryption options 'gost' and 'waves'
   networkByte: 'V'.charCodeAt(0)
 }
 
 const Waves = WeSdk.create({
   initialConfiguration: config,
-//  fetchInstance: node-fetch // Browser feature. For Node.js use node-fetch
+  fetchInstance: window.fetch // Browser feature. For Node.js use node-fetch
 });
 
-var input = document.getElementById('password');
 var button = document.getElementById('send_button');
 if(button != null) {
   button.addEventListener('click', () => {
-    createSeed(input.value);
-  });
-}
-
-var addresToInput = document.getElementById('addres_to');
-var amountInput = document.getElementById('amount_input');
-var sendTransactionButton = document.getElementById('send_transaction_button');
-if(sendTransactionButton != null) {
-  sendTransactionButton.addEventListener('click', () => {
-    brodcastTransaction(addresToInput.value, amountInput.value)
+    createSeed();
   });
 }
 
@@ -48,32 +38,15 @@ if(callContractBtn != null) {
   })
 }
 
-function createSeed(password) {
-	const seed = Waves.Seed.create();
-	
-	console.log(seed.phrase);
-	
-	const encrypted = seed.encrypt(password);
-	console.log(encrypted);
-	const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
-  
-  console.log(restoredPhrase);
-  saveSeedToLocalStorage(seed);
-
+function createSeed() {
+  const seed = Waves.Seed.create();
   createMsgBox(seed);
   return seed;
 }
 
 function restoreSeed(seedPhrase) {
   const seed = Waves.Seed.fromExistingPhrase(seedPhrase);
-  saveSeedToLocalStorage(seed);
   createMsgBox(seed);
-}
-
-function saveSeedToLocalStorage(seed) {
-  localStorage.setItem('address', seed.address);
-  localStorage.setItem('publicKey', seed.keyPair.publicKey);
-  localStorage.setItem('privateKey', seed.keyPair.privateKey);
 }
 
 function createMsgBox(seed) {
@@ -100,65 +73,47 @@ function createMsgBox(seed) {
   }
 }
 
-function brodcastTransaction(addressTo, amount) {
-  const txBody = {
-    sender: localStorage.getItem('address'),
-    recipient: addressTo,
-    assetId: '',
-    amount: parseInt(amount, 10),
-    fee: 0,
-    attachment: Waves.tools.base58.encode('Examples transfer attachment'),
-    timestamp: Date.now()
-  };
-
-  const tx = Waves.API.Transactions.Transfer.V3(txBody);
-
-  var keyPair = getKeyPair();
-  var result = tx.broadcast(keyPair);
-  Promise.resolve(result).then(function(result) {
-    console.log(result);
-    alert('transaction id: ' + result.id);
-  })
-
-}
-
 function callContract(contractId, version) {
-	console.log(version);
-  const txBody = {
-    contractId: contractId,
-    fee: 0,
-    sender: localStorage.getItem('address'),
-    params: [ {
-      key: 'action',
-      type: 'string',
-      value: 'createUserRegistrationRequest'
-    },
-    {
-      key: 'privateDataHash',
-      type: 'string',
-      value: 'todo'
-     }
-    ],
-    contractVersion: parseInt(version, 10),
-	timestamp: Date.now(),
-    atomicBadge: null
-  };
-
-  const tx = Waves.API.Transactions.CallContract.V3(txBody);
-  var keyPair = getKeyPair();
-  var result = tx.broadcast(keyPair);
-  Promise.resolve(result).then(function(result) {
-    console.log(result);
-    alert('transaction id: ' + result.id);
-  })
+  const state = getPublicState();
+    Promise.resolve(state).then(function(state) {
+      const txBody = {
+        contractId: contractId,
+        fee: 0,
+        sender: state.account.address,
+        params: [ {
+          key: 'action',
+          type: 'string',
+          value: 'createUserRegistrationRequest'
+        },
+        {
+          key: 'privateDataHash',
+          type: 'string',
+          value: 'todo'
+         }
+        ],
+        contractVersion: parseInt(version, 10),
+    	timestamp: Date.now(),
+        atomicBadge: null
+      };
+    
+      const tx = Waves.API.Transactions.CallContract.V2(txBody);
+      var signed = window.WEWallet.signTransaction({ type: 'dockerCallV2', tx: { ...tx, authorPublicKey: state.account.publicKey } })
+        Promise.resolve(signed).then(function(signed) {
+          const txBroadcastResult = Waves.API.Node.transactions.rawBroadcast(signed)
+            Promise.resolve(txBroadcastResult).then(function(txBroadcastResult) {
+              alert('transaction id: ' + txBroadcastResult.id);
+            })
+        })
+    })
 }
 
-function getKeyPair() {
-  var keyPair = {
-    publicKey: localStorage.getItem('publicKey'),
-    privateKey: localStorage.getItem('privateKey')
-  };
-  return keyPair;
+function getPublicState() {
+  try {
+      const state = window.WEWallet.publicState();
+      return state;
+  } catch(error) {
+      console.error(error); // displaying the result in the console
+  }
 }
 
 function App() {
