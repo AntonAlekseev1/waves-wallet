@@ -41,10 +41,11 @@ if(restoreBtn != null) {
 
 var contractIdInput = document.getElementById('contract_id');
 var versionInput = document.getElementById('contract_version');
+var privateDataHashInput = document.getElementById('private_data_hash');
 var callContractBtn = document.getElementById('call_contract_btn');
 if(callContractBtn != null) {
   callContractBtn.addEventListener('click', () => {
-    callContract(contractIdInput.value, versionInput.value);
+    callContract(contractIdInput.value, versionInput.value, privateDataHashInput.value);
   })
 }
 
@@ -122,7 +123,7 @@ function brodcastTransaction(addressTo, amount) {
 
 }
 
-function callContract(contractId, version) {
+function callContract(contractId, version, privateDataHash) {
 	console.log(version);
   const txBody = {
     contractId: contractId,
@@ -131,11 +132,11 @@ function callContract(contractId, version) {
     params: [ {
       key: 'action',
       type: 'string',
-      value: 'createUserRegistrationRequest'
+      value: 'createParticipant'
     },
     {
       key: 'privateDataHash',
-      type: 'string',
+      type: privateDataHash,
       value: 'todo'
      }
     ],
