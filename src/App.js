@@ -136,8 +136,8 @@ function callContract(contractId, version, privateDataHash) {
     },
     {
       key: 'privateDataHash',
-      type: privateDataHash,
-      value: 'todo'
+      type: 'string',
+      value: privateDataHash
      }
     ],
     contractVersion: parseInt(version, 10),
