@@ -6,7 +6,7 @@ const config = {
   ...WeSdk.MAINNET_CONFIG,
   nodeAddress: '/node-test/',
   crypto: 'gost', // there are two encryption options 'gost' and 'waves'
-  networkByte: 'V'.charCodeAt(0)
+  networkByte: 'Z'.charCodeAt(0)
 }
 
 const Waves = WeSdk.create({
