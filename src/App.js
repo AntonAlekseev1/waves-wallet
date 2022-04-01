@@ -45,7 +45,21 @@ var privateDataHashInput = document.getElementById('private_data_hash');
 var callContractBtn = document.getElementById('call_contract_btn');
 if(callContractBtn != null) {
   callContractBtn.addEventListener('click', () => {
-    callContract(contractIdInput.value, versionInput.value, privateDataHashInput.value);
+    createParticipant(contractIdInput.value, versionInput.value, privateDataHashInput.value);
+  })
+}
+
+var dealContractIdInput = document.getElementById('deal_contract_id');
+var dealVersionInput = document.getElementById('deal_contract_version_deal');
+var dealRecipientAddress = document.getElementById('deal_recipient_address');
+var parentDealId = document.getElementById('parent_deal_id');
+var externalDealId = document.getElementById('external_deal_id');
+var dealPrivacyDataHashInput = document.getElementById('deal_privacy_data_hash');
+var dealCallContractBtn = document.getElementById('deal_call_contract_btn');
+if(dealCallContractBtn != null) {
+  dealCallContractBtn.addEventListener('click', () => {
+    createDeal(dealContractIdInput.value, dealVersionInput.value, dealRecipientAddress.value, 
+                parentDealId.value, externalDealId.value, dealPrivacyDataHashInput.value);
   })
 }
 
@@ -123,8 +137,7 @@ function brodcastTransaction(addressTo, amount) {
 
 }
 
-function callContract(contractId, version, privateDataHash) {
-	console.log(version);
+function createParticipant(contractId, version, privateDataHash) {
   const txBody = {
     contractId: contractId,
     fee: 0,
@@ -145,6 +158,49 @@ function callContract(contractId, version, privateDataHash) {
     atomicBadge: null
   };
 
+  callContract(txBody);
+}
+
+function createDeal(contractId, version, recipientAddress, parentDealId, externalDealId, privacyDataHash) {
+  const txBody = {
+    contractId: contractId,
+    fee: 0,
+    sender: localStorage.getItem('address'),
+    params: [ {
+      key: 'action',
+      type: 'string',
+      value: 'createDeal'
+    },
+    {
+      key: 'recipientAddress',
+      type: 'string',
+      value: recipientAddress
+    },
+    {
+      key: 'parentDealId',
+      type: 'string',
+      value: parentDealId
+    },
+    {
+      key: 'externalDealId',
+      type: 'string',
+      value: externalDealId
+    },
+    {
+      key: 'privacyDataHash',
+      type: 'string',
+      value: privacyDataHash
+     }
+    ],
+    contractVersion: parseInt(version, 10),
+	timestamp: Date.now(),
+    atomicBadge: null
+  };
+
+  callContract(txBody);
+}
+
+function callContract(txBody) {
   const tx = Waves.API.Transactions.CallContract.V3(txBody);
   var keyPair = getKeyPair();
   var result = tx.broadcast(keyPair);
