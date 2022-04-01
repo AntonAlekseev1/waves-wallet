@@ -41,6 +41,7 @@ if(restoreBtn != null) {
 
 var contractIdInput = document.getElementById('contract_id');
 var versionInput = document.getElementById('contract_version');
+
 var privateDataHashInput = document.getElementById('private_data_hash');
 var callContractBtn = document.getElementById('call_contract_btn');
 if(callContractBtn != null) {
@@ -49,8 +50,6 @@ if(callContractBtn != null) {
   })
 }
 
-var dealContractIdInput = document.getElementById('deal_contract_id');
-var dealVersionInput = document.getElementById('deal_contract_version_deal');
 var dealRecipientAddress = document.getElementById('deal_recipient_address');
 var parentDealId = document.getElementById('parent_deal_id');
 var externalDealId = document.getElementById('external_deal_id');
@@ -58,11 +57,18 @@ var dealPrivacyDataHashInput = document.getElementById('deal_privacy_data_hash')
 var dealCallContractBtn = document.getElementById('deal_call_contract_btn');
 if(dealCallContractBtn != null) {
   dealCallContractBtn.addEventListener('click', () => {
-    createDeal(dealContractIdInput.value, dealVersionInput.value, dealRecipientAddress.value, 
+    createDeal(contractIdInput.value, versionInput.value, dealRecipientAddress.value, 
                 parentDealId.value, externalDealId.value, dealPrivacyDataHashInput.value);
   })
 }
 
+var dealInput = document.getElementById('deal_id');
+var createDealBtn = document.getElementById('create_deal_btn');
+if(createDealBtn != null) {
+  createDealBtn.addEventListener('click', () => {
+    createPayment(contractIdInput.value, versionInput.value, dealInput.value);
+  })
+}
 function createSeed(password) {
 	const seed = Waves.Seed.create();
 	
@@ -191,6 +197,30 @@ function createDeal(contractId, version, recipientAddress, parentDealId, externa
       type: 'string',
       value: privacyDataHash
      }
+    ],
+    contractVersion: parseInt(version, 10),
+	timestamp: Date.now(),
+    atomicBadge: null
+  };
+
+  callContract(txBody);
+}
+
+function createPayment(contractId, version, dealId) {
+  const txBody = {
+    contractId: contractId,
+    fee: 0,
+    sender: localStorage.getItem('address'),
+    params: [ {
+      key: 'action',
+      type: 'string',
+      value: 'createPayment'
+    },
+    {
+      key: 'dealId',
+      type: 'string',
+      value: dealId
+    }
     ],
     contractVersion: parseInt(version, 10),
 	timestamp: Date.now(),
