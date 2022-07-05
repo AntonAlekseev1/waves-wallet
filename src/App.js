@@ -14,20 +14,10 @@ const Waves = WeSdk.create({
 //  fetchInstance: node-fetch // Browser feature. For Node.js use node-fetch
 });
 
-var input = document.getElementById('password');
 var button = document.getElementById('send_button');
 if(button != null) {
   button.addEventListener('click', () => {
-    createSeed(input.value);
-  });
-}
-
-var addresToInput = document.getElementById('addres_to');
-var amountInput = document.getElementById('amount_input');
-var sendTransactionButton = document.getElementById('send_transaction_button');
-if(sendTransactionButton != null) {
-  sendTransactionButton.addEventListener('click', () => {
-    brodcastTransaction(addresToInput.value, amountInput.value)
+    createSeed();
   });
 }
 
@@ -42,43 +32,67 @@ if(restoreBtn != null) {
 var contractIdInput = document.getElementById('contract_id');
 var versionInput = document.getElementById('contract_version');
 
-var privateDataHashInput = document.getElementById('private_data_hash');
-var callContractBtn = document.getElementById('call_contract_btn');
+var privacyDataHashInput = document.getElementById('org_privacy_data_hash');
+var callContractBtn = document.getElementById('createOrg_btn');
 if(callContractBtn != null) {
   callContractBtn.addEventListener('click', () => {
-    createParticipant(contractIdInput.value, versionInput.value, privateDataHashInput.value);
+    createOrg(contractIdInput.value, versionInput.value, privacyDataHashInput.value);
   })
 }
 
-var dealRecipientAddress = document.getElementById('deal_recipient_address');
-var parentDealId = document.getElementById('parent_deal_id');
-var externalDealId = document.getElementById('external_deal_id');
+var orgIdInput = document.getElementById('org_id');
+var memberPrivacyDataHashInput = document.getElementById('member_privacy_data_hash');
+var addOrgMemberBtn = document.getElementById('addOrgMember_btn');
+if(addOrgMemberBtn != null) {
+  addOrgMemberBtn.addEventListener('click', () => {
+    addOrgMember(contractIdInput.value, versionInput.value, orgIdInput.value, 
+                memberPrivacyDataHashInput.value);
+  })
+}
+
+var payerIdInput = document.getElementById('deal_payer_id');
+var recipientIdInput = document.getElementById('deal_recipient_id');
+var externalDealIdInput = document.getElementById('external_deal_id');
+var parentDealIdInput = document.getElementById('parent_deal_id');
 var dealPrivacyDataHashInput = document.getElementById('deal_privacy_data_hash');
-var dealCallContractBtn = document.getElementById('deal_call_contract_btn');
-if(dealCallContractBtn != null) {
-  dealCallContractBtn.addEventListener('click', () => {
-    createDeal(contractIdInput.value, versionInput.value, dealRecipientAddress.value, 
-                parentDealId.value, externalDealId.value, dealPrivacyDataHashInput.value);
-  })
-}
-
-var dealInput = document.getElementById('deal_id');
-var createDealBtn = document.getElementById('create_deal_btn');
+var createDealBtn = document.getElementById('createDeal_btn');
 if(createDealBtn != null) {
   createDealBtn.addEventListener('click', () => {
-    createPayment(contractIdInput.value, versionInput.value, dealInput.value);
+    createDeal(contractIdInput.value, versionInput.value, payerIdInput.value,
+              recipientIdInput.value, parentDealIdInput.value, externalDealIdInput.value, 
+              dealPrivacyDataHashInput.value);
   })
 }
-function createSeed(password) {
-	const seed = Waves.Seed.create();
-	
-	console.log(seed.phrase);
-	
-	const encrypted = seed.encrypt(password);
-	console.log(encrypted);
-	const restoredPhrase = Waves.Seed.decryptSeedPhrase(encrypted, password);
-  
-  console.log(restoredPhrase);
+
+var actDealIdInput = document.getElementById('act_deal_id');
+var actPrivacyDataHashInput = document.getElementById('act_privacy_data_hash');
+var createActBtn = document.getElementById('createAct_btn');
+if(createActBtn != null) {
+  createActBtn.addEventListener('click', () => {
+    createAct(contractIdInput.value, versionInput.value, actDealIdInput.value,
+    actPrivacyDataHashInput.value);
+  })
+}
+
+var paymentDealIdInput = document.getElementById('deal_id');
+var createPaymentByDealBtn = document.getElementById('createPaymentByDeal_btn');
+if(createPaymentByDealBtn != null) {
+  createPaymentByDealBtn.addEventListener('click', () => {
+    createPaymentByDeal(contractIdInput.value, versionInput.value, paymentDealIdInput.value);
+  })
+}
+
+var paymentActIdInput = document.getElementById('act_id');
+var createPaymentByActBtn = document.getElementById('createPaymentByAct_btn');
+if(createPaymentByActBtn != null) {
+  createPaymentByActBtn.addEventListener('click', () => {
+    createPaymentByAct(contractIdInput.value, versionInput.value, paymentActIdInput.value);
+  })
+}
+
+function createSeed() {
+  const seed = Waves.Seed.create();
+  console.log(seed.phrase);
   saveSeedToLocalStorage(seed);
 
   createMsgBox(seed);
@@ -121,29 +135,7 @@ function createMsgBox(seed) {
   }
 }
 
-function brodcastTransaction(addressTo, amount) {
-  const txBody = {
-    sender: localStorage.getItem('address'),
-    recipient: addressTo,
-    assetId: '',
-    amount: parseInt(amount, 10),
-    fee: 0,
-    attachment: Waves.tools.base58.encode('Examples transfer attachment'),
-    timestamp: Date.now()
-  };
-
-  const tx = Waves.API.Transactions.Transfer.V3(txBody);
-
-  var keyPair = getKeyPair();
-  var result = tx.broadcast(keyPair);
-  Promise.resolve(result).then(function(result) {
-    console.log(result);
-    alert('transaction id: ' + result.id);
-  })
-
-}
-
-function createParticipant(contractId, version, privateDataHash) {
+function createOrg(contractId, version, privacyDataHash) {
   const txBody = {
     contractId: contractId,
     fee: 0,
@@ -151,12 +143,12 @@ function createParticipant(contractId, version, privateDataHash) {
     params: [ {
       key: 'action',
       type: 'string',
-      value: 'createParticipant'
+      value: 'createOrg'
     },
     {
-      key: 'privateDataHash',
+      key: 'privacyDataHash',
       type: 'string',
-      value: privateDataHash
+      value: privacyDataHash
      }
     ],
     contractVersion: parseInt(version, 10),
@@ -167,7 +159,36 @@ function createParticipant(contractId, version, privateDataHash) {
   callContract(txBody);
 }
 
-function createDeal(contractId, version, recipientAddress, parentDealId, externalDealId, privacyDataHash) {
+function addOrgMember(contractId, version, orgId, privacyDataHash) {
+  const txBody = {
+    contractId: contractId,
+    fee: 0,
+    sender: localStorage.getItem('address'),
+    params: [ {
+      key: 'action',
+      type: 'string',
+      value: 'addOrgMember'
+    },
+    {
+      key: 'orgId',
+      type: 'string',
+      value: orgId
+     },
+    {
+      key: 'privacyDataHash',
+      type: 'string',
+      value: privacyDataHash
+     }
+    ],
+    contractVersion: parseInt(version, 10),
+	timestamp: Date.now(),
+    atomicBadge: null
+  };
+
+  callContract(txBody);
+}
+
+function createDeal(contractId, version, payerId, recipientId, parentDealId, externalDealId, privacyDataHash) {
   const txBody = {
     contractId: contractId,
     fee: 0,
@@ -178,9 +199,14 @@ function createDeal(contractId, version, recipientAddress, parentDealId, externa
       value: 'createDeal'
     },
     {
-      key: 'recipientAddress',
+      key: 'payerId',
       type: 'string',
-      value: recipientAddress
+      value: payerId
+    },
+    {
+      key: 'recipientId',
+      type: 'string',
+      value: recipientId
     },
     {
       key: 'parentDealId',
@@ -206,7 +232,36 @@ function createDeal(contractId, version, recipientAddress, parentDealId, externa
   callContract(txBody);
 }
 
-function createPayment(contractId, version, dealId) {
+function createAct(contractId, version, dealId, privacyDataHash) {
+  const txBody = {
+      contractId: contractId,
+      fee: 0,
+      sender: localStorage.getItem('address'),
+      params: [ {
+        key: 'action',
+        type: 'string',
+        value: 'createAct'
+      },
+      {
+        key: 'dealId',
+        type: 'string',
+        value: dealId
+      },
+      {
+        key: 'privacyDataHash',
+        type: 'string',
+        value: privacyDataHash
+      }
+      ],
+      contractVersion: parseInt(version, 10),
+  	timestamp: Date.now(),
+      atomicBadge: null
+    };
+  
+    callContract(txBody);
+}
+
+function createPaymentByDeal(contractId, version, dealId) {
   const txBody = {
     contractId: contractId,
     fee: 0,
@@ -214,12 +269,36 @@ function createPayment(contractId, version, dealId) {
     params: [ {
       key: 'action',
       type: 'string',
-      value: 'createPayment'
+      value: 'createPaymentByDeal'
     },
     {
       key: 'dealId',
       type: 'string',
       value: dealId
+    }
+    ],
+    contractVersion: parseInt(version, 10),
+	timestamp: Date.now(),
+    atomicBadge: null
+  };
+
+  callContract(txBody);
+}
+
+function createPaymentByAct(contractId, version, actId) {
+  const txBody = {
+    contractId: contractId,
+    fee: 0,
+    sender: localStorage.getItem('address'),
+    params: [ {
+      key: 'action',
+      type: 'string',
+      value: 'createPaymentByAct'
+    },
+    {
+      key: 'actId',
+      type: 'string',
+      value: actId
     }
     ],
     contractVersion: parseInt(version, 10),

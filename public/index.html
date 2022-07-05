@@ -8,8 +8,7 @@
   <body>
     <div id="root"></div>
 	<div>
-	  <p><b>Введите пароль для шифрования seed фразы</b></p><Br>
-         <input type = "password" placeholder = "password" id = "password">
+	  <p><b>Создание кошельк</b></p><Br>
 	     <button id = "send_button">Создать кошелек</button>
 	  <p></p>
 	  <p><b>Восстановить кошелек по seed фразе</b></p><Br>
@@ -18,19 +17,33 @@
 	  <p><b>Ид и версия смарт-контракта</b></p>
 		<input type = "text" placeholder = "contract Id" id = "contract_id">
 		<input type = "number" placeholder = "contract version" id = "contract_version">
-	  <p><b>Регистрация пользователя</b></p><Br>
-		<input type = "text" placeholder = "privateDataHash" id = "private_data_hash">
-		<button id = "call_contract_btn">Отправить</button>
-	  <p><b>Регистрация сделки</b></p><Br>
-		<input type = "text" placeholder = "dealRecipientAddress" id = "deal_recipient_address">
-		<input type = "text" placeholder = "parentDealId" id = "parent_deal_id">
+
+	  <p id = "createOrg"><b>Создание организации (createOrg)</b></p><Br>
+		<input type = "text" placeholder = "privacyDataHash" id = "org_privacy_data_hash">
+		<button id = "createOrg_btn">Отправить</button>
+	  <p id = "addOrgMember"><b>Добавление участника организации (addOrgMember)</b></p><Br>
+		<input type = "text" placeholder = "orgId" id = "org_id">
+		<input type = "text" placeholder = "privacyDataHash" id = "member_privacy_data_hash">
+		<button id = "addOrgMember_btn">Отправить</button>
+	  <p id = "createDeal"><b>Регистрация сделки (createDeal)</b></p><Br>
+		<input type = "text" placeholder = "payerId" id = "deal_payer_id">
+		<input type = "text" placeholder = "recipientId" id = "deal_recipient_id">
 	  <p></p>
+		<input type = "text" placeholder = "parentDealId" id = "parent_deal_id">
 		<input type = "text" placeholder = "externalDealId" id = "external_deal_id">
+	  <p></p>
 		<input type = "text" placeholder = "dealPrivacyDataHash" id = "deal_privacy_data_hash">
-		<button id = "deal_call_contract_btn">Отправить</button>
-	  <p><b>Регистрация платежа</b></p><Br>
+		<button id = "createDeal_btn">Отправить</button>
+	  <p id = "createAct"><b>Регистрация акта (createAct)</b></p><Br>
+		<input type = "text" placeholder = "dealId" id = "act_deal_id">
+		<input type = "text" placeholder = "privacyDataHash" id = "act_privacy_data_hash">
+		<button id = "createAct_btn">Отправить</button>
+	  <p id = "createPaymentByDeal"><b>Создание платежа по сделке (createPaymentByDeal)</b></p><Br>
 		<input type = "text" placeholder = "dealId" id = "deal_id">
-		<button id = "create_deal_btn">Отправить</button>
+		<button id = "createPaymentByDeal_btn">Отправить</button>
+	  <p id = "createPaymentByAct"><b>Создание платежа по акту (createPaymentByAct)</b></p><Br>
+		<input type = "text" placeholder = "actlId" id = "act_id">
+		<button id = "createPaymentByAct_btn">Отправить</button>
 	</div>
   </body>
 </html>
