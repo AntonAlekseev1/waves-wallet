@@ -32,6 +32,13 @@ if(restoreBtn != null) {
 var contractIdInput = document.getElementById('contract_id');
 var versionInput = document.getElementById('contract_version');
 
+var addPlatformMemberRoleBtn = document.getElementById('addPlatformMemberRole_btn');
+if(addPlatformMemberRoleBtn != null) {
+  addPlatformMemberRoleBtn.addEventListener('click', () => {
+    addPlatformMemberRole(contractIdInput.value, versionInput.value);
+  })
+}
+
 var privacyDataHashInput = document.getElementById('org_privacy_data_hash');
 var callContractBtn = document.getElementById('createOrg_btn');
 if(callContractBtn != null) {
@@ -133,6 +140,25 @@ function createMsgBox(seed) {
   closeBtn.onclick = function() {
     panel.parentNode.removeChild(panel);
   }
+}
+
+function addPlatformMemberRole(contractId, version) {
+const txBody = {
+    contractId: contractId,
+    fee: 0,
+    sender: localStorage.getItem('address'),
+    params: [ {
+      key: 'action',
+      type: 'string',
+      value: 'addPlatformMemberRole'
+    }
+    ],
+    contractVersion: parseInt(version, 10),
+	timestamp: Date.now(),
+    atomicBadge: null
+  };
+
+  callContract(txBody);
 }
 
 function createOrg(contractId, version, privacyDataHash) {
